@@ -1,0 +1,17 @@
+# 套件與建置輸出
+node_modules/
+dist/
+coverage/
+
+# 本機環境設定
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# 執行紀錄
+*.log
+
+# 作業系統檔案
+.DS_Store
+Thumbs.db
