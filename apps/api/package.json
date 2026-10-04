@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
+    "dev": "tsx watch src/server.js",
+    "start": "tsx src/server.js",
     "prisma:validate": "prisma validate",
     "prisma:generate": "prisma generate"
   },
@@ -14,7 +14,8 @@
     "@prisma/client": "7.10.0",
     "dotenv": "18.0.5",
     "express": "5.2.1",
-    "pg": "8.23.1"
+    "pg": "8.23.1",
+    "tsx": "4.23.15"
   },
   "devDependencies": {
     "prisma": "7.10.0"
