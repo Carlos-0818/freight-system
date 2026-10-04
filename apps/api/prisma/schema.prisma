@@ -7,3 +7,37 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum UserRole {
+    DRIVER
+    LINEHAUL_DRIVER
+    CLERK
+    SUPERVISOR
+}
+
+model Station {
+    id          Int         @id @default(autoincrement())
+    code        String      @unique
+    name        String
+    isActive    Boolean     @default(true)
+    createdAt   DateTime    @default(now()) @db.Timestamptz(3)
+    updatedAt   DateTime    @updatedAt  @db.Timestamptz(3)
+
+    users User[]
+}
+
+model User {
+    id              Int         @id @default(autoincrement())
+    username        String      @unique
+    passwordHash    String
+    name            String
+    role            UserRole
+    isActive        Boolean     @default(true)
+    stationId       Int
+    createdAt       DateTime    @default(now()) @db.Timestamptz(3)
+    updatedAt       DateTime    @updatedAt  @db.Timestamptz(3)
+
+    station Station @relation(fields: [stationId], references: [id], onDelete: Restrict)
+
+    @@index([stationId])
+}
