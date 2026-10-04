@@ -5,9 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "prisma:validate": "prisma validate",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
-    "express": "5.2.1"
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "dotenv": "18.0.5",
+    "express": "5.2.1",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "prisma": "7.10.0"
   }
 }

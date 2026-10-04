@@ -15,3 +15,6 @@ coverage/
 # 作業系統檔案
 .DS_Store
 Thumbs.db
+
+# Prisma 自動產生的 Client
+/apps/api/src/generated/prisma/
