@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import LoginForm from "./features/auth/LoginForm.jsx";
+import StationList from "./features/stations/StationList.jsx";
 
 const ROLE_LABELS = {
   DRIVER: "收貨／配送司機",
@@ -13,6 +14,7 @@ export default function App() {
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("尚未檢查 API 連線。");
   const [session, setSession] = useState(null);
+  const [authNotice, setAuthNotice] = useState("");
 
   async function checkApiHealth() {
     setStatus("loading");
@@ -38,6 +40,16 @@ export default function App() {
       setMessage(`API 檢查失敗：${error.message}`);
     }
   }
+
+  function handleLoginSuccess(result) {
+    setAuthNotice("");
+    setSession(result);
+  }
+
+  const handleUnauthorized = useCallback(() => {
+    setSession(null);
+    setAuthNotice("登入已失效，請重新登入。");
+  }, []);
 
   return (
     <main>
@@ -67,9 +79,18 @@ export default function App() {
           <button type="button" onClick={() => setSession(null)}>
             登出
           </button>
+
+          <StationList
+            token={session.accessToken}
+            onUnauthorized={handleUnauthorized}
+          />
         </section>
       ) : (
-        <LoginForm onLoginSuccess={setSession} />
+        <>
+          {authNotice && <p role="alert">{authNotice}</p>}
+
+          <LoginForm onLoginSuccess={handleLoginSuccess} />
+        </>
       )}
 
       <button
