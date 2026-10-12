@@ -9,35 +9,73 @@ datasource db {
 }
 
 enum UserRole {
-    DRIVER
-    LINEHAUL_DRIVER
-    CLERK
-    SUPERVISOR
+  DRIVER
+  LINEHAUL_DRIVER
+  CLERK
+  SUPERVISOR
 }
 
 model Station {
-    id          Int         @id @default(autoincrement())
-    code        String      @unique
-    name        String
-    isActive    Boolean     @default(true)
-    createdAt   DateTime    @default(now()) @db.Timestamptz(3)
-    updatedAt   DateTime    @updatedAt  @db.Timestamptz(3)
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
-    users User[]
+  users User[]
+
+  originatingShipments Shipment[] @relation("ShipmentOriginStation")
+  destinationShipments Shipment[] @relation("ShipmentDestinationStation")
 }
 
 model User {
-    id              Int         @id @default(autoincrement())
-    username        String      @unique
-    passwordHash    String
-    name            String
-    role            UserRole
-    isActive        Boolean     @default(true)
-    stationId       Int
-    createdAt       DateTime    @default(now()) @db.Timestamptz(3)
-    updatedAt       DateTime    @updatedAt  @db.Timestamptz(3)
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  name         String
+  role         UserRole
+  isActive     Boolean  @default(true)
+  stationId    Int
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
 
-    station Station @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  station          Station    @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  createdShipments Shipment[] @relation("ShipmentCreatedBy")
 
-    @@index([stationId])
+  @@index([stationId])
+}
+
+model Shipment {
+  id                   Int      @id @default(autoincrement())
+  paperNumber          String   @unique
+  originStationId      Int
+  destinationStationId Int
+  createdById          Int
+  createdAt            DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime @updatedAt @db.Timestamptz(3)
+
+  originStation      Station @relation("ShipmentOriginStation", fields: [originStationId], references: [id], onDelete: Restrict)
+  destinationStation Station @relation("ShipmentDestinationStation", fields: [destinationStationId], references: [id], onDelete: Restrict)
+  createdBy          User    @relation("ShipmentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+
+  packages Package[]
+
+  @@index([originStationId])
+  @@index([destinationStationId])
+  @@index([createdById])
+}
+
+model Package {
+  id            Int      @id @default(autoincrement())
+  code          String   @unique
+  shipmentId    Int
+  sequence      Int
+  needsHandover Boolean  @default(false)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
+
+  @@unique([shipmentId, sequence])
 }
