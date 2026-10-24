@@ -47,13 +47,14 @@ model User {
 }
 
 model Shipment {
-  id                   Int      @id @default(autoincrement())
-  paperNumber          String   @unique
-  originStationId      Int
-  destinationStationId Int
-  createdById          Int
-  createdAt            DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt            DateTime @updatedAt @db.Timestamptz(3)
+  id                    Int       @id @default(autoincrement())
+  paperNumber           String    @unique
+  originStationId       Int
+  destinationStationId  Int
+  createdById           Int
+  driverQuotedAmount    Decimal?  @db.Decimal(12, 2)
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
 
   originStation      Station @relation("ShipmentOriginStation", fields: [originStationId], references: [id], onDelete: Restrict)
   destinationStation Station @relation("ShipmentDestinationStation", fields: [destinationStationId], references: [id], onDelete: Restrict)

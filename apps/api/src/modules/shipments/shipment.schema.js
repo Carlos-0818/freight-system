@@ -25,6 +25,14 @@ export const createShipmentSchema = z
       .min(1, { error: "請選擇最終配送站所。" })
       .max(2147483647, { error: "最終配送站所 ID 超出範圍。" }),
 
+    driverQuotedAmount: z
+      .string({ error: "司機指定價格必須以字串傳入。" })
+      .trim()
+      .regex(/^(0|[1-9]\d{0,9})(\.\d{1,2})?$/, {
+        error: "司機指定價格必須是非負金額，最多兩位小數。",
+      })
+      .optional(),
+
     handoverSequences: z
       .array(
         z

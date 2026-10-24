@@ -13,8 +13,13 @@ export class ShipmentServiceError extends Error {
 // input 必須先通過 createShipmentSchema 驗證。
 // user 必須來自 requireAuth 所建立的 req.user。
 export async function createShipment(input, user) {
-  const { paperNumber, packageCount, destinationStationId, handoverSequences } =
-    input;
+  const {
+    paperNumber,
+    packageCount,
+    destinationStationId,
+    handoverSequences,
+    driverQuotedAmount,
+  } = input;
 
   const handoverSet = new Set(handoverSequences);
 
@@ -44,6 +49,7 @@ export async function createShipment(input, user) {
           originStationId: user.station.id,
           destinationStationId,
           createdById: user.id,
+          driverQuotedAmount,
           packages: {
             create: Array.from({ length: packageCount }, (_, index) => {
               const sequence = index + 1;
@@ -59,6 +65,7 @@ export async function createShipment(input, user) {
         select: {
           id: true,
           paperNumber: true,
+          driverQuotedAmount: true,
           createdAt: true,
           originStation: {
             select: {
