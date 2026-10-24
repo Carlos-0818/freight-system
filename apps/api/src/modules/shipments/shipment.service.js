@@ -19,6 +19,8 @@ export async function createShipment(input, user) {
     destinationStationId,
     handoverSequences,
     driverQuotedAmount,
+    collectedAmount,
+    collectedAt,
   } = input;
 
   const handoverSet = new Set(handoverSequences);
@@ -50,6 +52,18 @@ export async function createShipment(input, user) {
           destinationStationId,
           createdById: user.id,
           driverQuotedAmount,
+          ...(collectedAmount !== undefined
+            ? {
+                paymentRecords: {
+                  create: {
+                    amount: collectedAmount,
+                    collectedAt: new Date(collectedAt),
+                    collectedById: user.id,
+                    recordedById: user.id,
+                  },
+                },
+              }
+            : {}),
           packages: {
             create: Array.from({ length: packageCount }, (_, index) => {
               const sequence = index + 1;
@@ -66,6 +80,17 @@ export async function createShipment(input, user) {
           id: true,
           paperNumber: true,
           driverQuotedAmount: true,
+          paymentRecords: {
+            orderBy: [{ collectedAt: "asc" }, { id: "asc" }],
+            select: {
+              id: true,
+              amount: true,
+              collectedAt: true,
+              createdAt: true,
+              collectedById: true,
+              recordedById: true,
+            },
+          },
           createdAt: true,
           originStation: {
             select: {

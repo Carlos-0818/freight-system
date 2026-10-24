@@ -33,6 +33,24 @@ export const createShipmentSchema = z
       })
       .optional(),
 
+    collectedAmount: z
+      .string({ error: "實收金額必須以字串傳入。" })
+      .trim()
+      .regex(/^(0|[1-9]\d{0,9})(\.\d{1,2})?$/, {
+        error: "實收金額格式不正確，最多兩位小數。",
+      })
+      .refine((value) => /[1-9]/.test(value), {
+        error: "實收金額必須大於零。",
+      })
+      .optional(),
+
+    collectedAt: z.iso
+      .datetime({
+        offset: true,
+        error: "請提供包含時區的有效收款時間。",
+      })
+      .optional(),
+
     handoverSequences: z
       .array(
         z
@@ -67,4 +85,24 @@ export const createShipmentSchema = z
 
       seen.add(sequence);
     });
+
+    // 收款驗證位於 forEach 外，不受點交清單是否為空影響。
+    const hasCollectedAmount = data.collectedAmount !== undefined;
+    const hasCollectedAt = data.collectedAt !== undefined;
+
+    if (hasCollectedAmount && !hasCollectedAt) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["collectedAt"],
+        message: "有實收金額時，必須提供實際收款時間。",
+      });
+    }
+
+    if (hasCollectedAt && !hasCollectedAmount) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["collectedAmount"],
+        message: "有收款時間時，必須提供實收金額。",
+      });
+    }
   });

@@ -40,27 +40,30 @@ model User {
   createdAt    DateTime @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime @updatedAt @db.Timestamptz(3)
 
-  station          Station    @relation(fields: [stationId], references: [id], onDelete: Restrict)
-  createdShipments Shipment[] @relation("ShipmentCreatedBy")
+  station           Station         @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  createdShipments  Shipment[]      @relation("ShipmentCreatedBy")
+  collectedPayments PaymentRecord[] @relation("PaymentCollectedBy")
+  recordedPayments  PaymentRecord[] @relation("PaymentRecordedBy")
 
   @@index([stationId])
 }
 
 model Shipment {
-  id                    Int       @id @default(autoincrement())
-  paperNumber           String    @unique
-  originStationId       Int
-  destinationStationId  Int
-  createdById           Int
-  driverQuotedAmount    Decimal?  @db.Decimal(12, 2)
-  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
-  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
+  id                   Int      @id @default(autoincrement())
+  paperNumber          String   @unique
+  originStationId      Int
+  destinationStationId Int
+  createdById          Int
+  driverQuotedAmount   Decimal? @db.Decimal(12, 2)
+  createdAt            DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime @updatedAt @db.Timestamptz(3)
 
   originStation      Station @relation("ShipmentOriginStation", fields: [originStationId], references: [id], onDelete: Restrict)
   destinationStation Station @relation("ShipmentDestinationStation", fields: [destinationStationId], references: [id], onDelete: Restrict)
   createdBy          User    @relation("ShipmentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
 
-  packages Package[]
+  packages       Package[]
+  paymentRecords PaymentRecord[]
 
   @@index([originStationId])
   @@index([destinationStationId])
@@ -79,4 +82,22 @@ model Package {
   shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
 
   @@unique([shipmentId, sequence])
+}
+
+model PaymentRecord {
+  id            Int      @id @default(autoincrement())
+  shipmentId    Int
+  amount        Decimal  @db.Decimal(12, 2)
+  collectedById Int
+  recordedById  Int
+  collectedAt   DateTime @db.Timestamptz(3)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+
+  shipment    Shipment @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
+  collectedBy User     @relation("PaymentCollectedBy", fields: [collectedById], references: [id], onDelete: Restrict)
+  recordedBy  User     @relation("PaymentRecordedBy", fields: [recordedById], references: [id], onDelete: Restrict)
+
+  @@index([shipmentId, collectedAt])
+  @@index([collectedById])
+  @@index([recordedById])
 }
