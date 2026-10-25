@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 
 import LoginForm from "./features/auth/LoginForm.jsx";
 import StationList from "./features/stations/StationList.jsx";
+import ShipmentForm from "./features/shipments/ShipmentForm.jsx";
 
 const ROLE_LABELS = {
   DRIVER: "收貨／配送司機",
@@ -84,6 +85,13 @@ export default function App() {
             token={session.accessToken}
             onUnauthorized={handleUnauthorized}
           />
+
+          {["DRIVER", "CLERK", "SUPERVISOR"].includes(session.user.role) && (
+            <ShipmentForm
+              token={session.accessToken}
+              onUnauthorized={handleUnauthorized}
+            />
+          )}
         </section>
       ) : (
         <>
