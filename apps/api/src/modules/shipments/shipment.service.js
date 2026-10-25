@@ -154,3 +154,59 @@ export async function createShipment(input, user) {
     throw error;
   }
 }
+
+// input 必須先通過 findShipmentQuerySchema 驗證。
+// 此查詢須由受 requireAuth 保護的端點呼叫。
+export async function findShipmentByPaperNumber(input) {
+  const shipment = await prisma.shipment.findUnique({
+    where: {
+      paperNumber: input.paperNumber,
+    },
+    select: {
+      id: true,
+      paperNumber: true,
+      createdAt: true,
+      originStation: {
+        select: {
+          id: true,
+          code: true,
+          name: true,
+        },
+      },
+      destinationStation: {
+        select: {
+          id: true,
+          code: true,
+          name: true,
+        },
+      },
+      createdBy: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      packages: {
+        orderBy: {
+          sequence: "asc",
+        },
+        select: {
+          id: true,
+          code: true,
+          sequence: true,
+          needsHandover: true,
+        },
+      },
+    },
+  });
+
+  if (!shipment) {
+    throw new ShipmentServiceError(
+      404,
+      "SHIPMENT_NOT_FOUND",
+      "找不到這個紙本單號的託運單。",
+    );
+  }
+
+  return shipment;
+}

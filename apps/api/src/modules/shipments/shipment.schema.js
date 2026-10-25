@@ -106,3 +106,11 @@ export const createShipmentSchema = z
       });
     }
   });
+
+export const findShipmentQuerySchema = z.strictObject({
+  paperNumber: z
+    .string({ error: "紙本單號必須是字串。" })
+    .trim()
+    .min(1, { error: "請輸入紙本單號。" })
+    .max(100, { error: "紙本單號不得超過 100 個字元。" }),
+});
