@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { apiRequest } from "../../lib/api.js";
+import PackageBarcode from "./PackageBarcode.jsx";
 
 export default function ShipmentLookup({ token, onUnauthorized }) {
   const [paperNumber, setPaperNumber] = useState("");
@@ -164,10 +165,7 @@ export default function ShipmentLookup({ token, onUnauthorized }) {
               <li key={pkg.id}>
                 <p>第 {pkg.sequence} 件</p>
 
-                <p>
-                  貨件編號：
-                  <code style={{ overflowWrap: "anywhere" }}>{pkg.code}</code>
-                </p>
+                <PackageBarcode code={pkg.code} />
 
                 <p>
                   點交標記：

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { apiRequest, ApiError } from "../../lib/api.js";
+import PackageBarcode from "./PackageBarcode.jsx";
 
 export default function ShipmentForm({ token, onUnauthorized }) {
   const [paperNumber, setPaperNumber] = useState("");
@@ -414,8 +415,12 @@ export default function ShipmentForm({ token, onUnauthorized }) {
           <ol>
             {createdShipment.packages.map((item) => (
               <li key={item.id}>
-                第 {item.sequence} 件：{item.code}
-                {item.needsHandover && <strong>（需點交）</strong>}
+                <p>
+                  第 {item.sequence} 件
+                  {item.needsHandover && <strong>（需點交）</strong>}
+                </p>
+
+                <PackageBarcode code={item.code} />
               </li>
             ))}
           </ol>
