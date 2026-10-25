@@ -15,6 +15,15 @@ enum UserRole {
   SUPERVISOR
 }
 
+enum TrackingEventType {
+  RECEIVED
+}
+
+enum TrackingInputMethod {
+  MANUAL
+  CAMERA
+}
+
 model Station {
   id        Int      @id @default(autoincrement())
   code      String   @unique
@@ -23,7 +32,8 @@ model Station {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
-  users User[]
+  users          User[]
+  trackingEvents TrackingEvent[]
 
   originatingShipments Shipment[] @relation("ShipmentOriginStation")
   destinationShipments Shipment[] @relation("ShipmentDestinationStation")
@@ -40,10 +50,12 @@ model User {
   createdAt    DateTime @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime @updatedAt @db.Timestamptz(3)
 
-  station           Station         @relation(fields: [stationId], references: [id], onDelete: Restrict)
-  createdShipments  Shipment[]      @relation("ShipmentCreatedBy")
-  collectedPayments PaymentRecord[] @relation("PaymentCollectedBy")
-  recordedPayments  PaymentRecord[] @relation("PaymentRecordedBy")
+  station                Station         @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  createdShipments       Shipment[]      @relation("ShipmentCreatedBy")
+  collectedPayments      PaymentRecord[] @relation("PaymentCollectedBy")
+  recordedPayments       PaymentRecord[] @relation("PaymentRecordedBy")
+  operatedTrackingEvents TrackingEvent[] @relation("TrackingEventOperator")
+  recordedTrackingEvents TrackingEvent[] @relation("TrackingEventRecorder")
 
   @@index([stationId])
 }
@@ -71,15 +83,18 @@ model Shipment {
 }
 
 model Package {
-  id            Int      @id @default(autoincrement())
-  code          String   @unique
-  shipmentId    Int
-  sequence      Int
-  needsHandover Boolean  @default(false)
-  createdAt     DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
+  id                    Int      @id @default(autoincrement())
+  code                  String   @unique
+  shipmentId            Int
+  sequence              Int
+  needsHandover         Boolean  @default(false)
+  latestTrackingEventId Int?     @unique
+  createdAt             DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime @updatedAt @db.Timestamptz(3)
 
-  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
+  shipment            Shipment        @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
+  trackingEvents      TrackingEvent[] @relation("PackageTrackingHistory")
+  latestTrackingEvent TrackingEvent?  @relation("PackageLatestTrackingEvent", fields: [latestTrackingEventId], references: [id], onDelete: Restrict)
 
   @@unique([shipmentId, sequence])
 }
@@ -99,5 +114,30 @@ model PaymentRecord {
 
   @@index([shipmentId, collectedAt])
   @@index([collectedById])
+  @@index([recordedById])
+}
+
+model TrackingEvent {
+  id           Int                 @id @default(autoincrement())
+  requestId    String              @unique @db.Uuid
+  packageId    Int
+  type         TrackingEventType
+  stationId    Int
+  operatorId   Int
+  recordedById Int
+  inputMethod  TrackingInputMethod
+  occurredAt   DateTime            @db.Timestamptz(3)
+  recordedAt   DateTime            @default(now()) @db.Timestamptz(3)
+
+  package    Package @relation("PackageTrackingHistory", fields: [packageId], references: [id], onDelete: Restrict)
+  station    Station @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  operator   User    @relation("TrackingEventOperator", fields: [operatorId], references: [id], onDelete: Restrict)
+  recordedBy User    @relation("TrackingEventRecorder", fields: [recordedById], references: [id], onDelete: Restrict)
+
+  latestForPackage Package? @relation("PackageLatestTrackingEvent")
+
+  @@index([packageId, occurredAt, id])
+  @@index([stationId, occurredAt])
+  @@index([operatorId])
   @@index([recordedById])
 }
