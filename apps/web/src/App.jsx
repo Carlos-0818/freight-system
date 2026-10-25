@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import LoginForm from "./features/auth/LoginForm.jsx";
 import StationList from "./features/stations/StationList.jsx";
 import ShipmentForm from "./features/shipments/ShipmentForm.jsx";
+import ShipmentLookup from "./features/shipments/ShipmentLookup.jsx";
 
 const ROLE_LABELS = {
   DRIVER: "收貨／配送司機",
@@ -92,6 +93,11 @@ export default function App() {
               onUnauthorized={handleUnauthorized}
             />
           )}
+
+          <ShipmentLookup
+            token={session.accessToken}
+            onUnauthorized={handleUnauthorized}
+          />
         </section>
       ) : (
         <>
