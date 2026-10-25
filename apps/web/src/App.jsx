@@ -4,6 +4,7 @@ import LoginForm from "./features/auth/LoginForm.jsx";
 import StationList from "./features/stations/StationList.jsx";
 import ShipmentForm from "./features/shipments/ShipmentForm.jsx";
 import ShipmentLookup from "./features/shipments/ShipmentLookup.jsx";
+import PackageLookup from "./features/shipments/PackageLookup.jsx";
 
 const ROLE_LABELS = {
   DRIVER: "收貨／配送司機",
@@ -95,6 +96,11 @@ export default function App() {
           )}
 
           <ShipmentLookup
+            token={session.accessToken}
+            onUnauthorized={handleUnauthorized}
+          />
+
+          <PackageLookup
             token={session.accessToken}
             onUnauthorized={handleUnauthorized}
           />
