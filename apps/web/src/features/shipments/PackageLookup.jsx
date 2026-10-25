@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { apiRequest } from "../../lib/api.js";
+import PackageBarcode from "./PackageBarcode.jsx";
 
 export default function PackageLookup({ token, onUnauthorized }) {
   const [code, setCode] = useState("");
@@ -120,6 +121,8 @@ export default function PackageLookup({ token, onUnauthorized }) {
           <p role="status">貨件查詢成功。</p>
 
           <h3>貨件資料</h3>
+
+          <PackageBarcode key={packageData.code} code={packageData.code} />
 
           <dl>
             <dt>貨件編號</dt>
