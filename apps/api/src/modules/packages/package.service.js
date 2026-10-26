@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma.js";
+import { packageTrackingSelect } from "../tracking/tracking.select.js";
 
 export class PackageServiceError extends Error {
   constructor(status, code, message) {
@@ -22,6 +23,7 @@ export async function findPackageByCode(input) {
       sequence: true,
       needsHandover: true,
       createdAt: true,
+      ...packageTrackingSelect,
       shipment: {
         select: {
           id: true,

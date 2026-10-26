@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { prisma } from "../../lib/prisma.js";
+import { packageTrackingSelect } from "../tracking/tracking.select.js";
 
 export class ShipmentServiceError extends Error {
   constructor(status, code, message) {
@@ -195,6 +196,7 @@ export async function findShipmentByPaperNumber(input) {
           code: true,
           sequence: true,
           needsHandover: true,
+          ...packageTrackingSelect,
         },
       },
     },
