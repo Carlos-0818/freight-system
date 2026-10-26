@@ -5,6 +5,7 @@ import StationList from "./features/stations/StationList.jsx";
 import ShipmentForm from "./features/shipments/ShipmentForm.jsx";
 import ShipmentLookup from "./features/shipments/ShipmentLookup.jsx";
 import PackageLookup from "./features/shipments/PackageLookup.jsx";
+import PackageReceiptForm from "./features/shipments/PackageReceiptForm.jsx";
 
 const ROLE_LABELS = {
   DRIVER: "收貨／配送司機",
@@ -89,10 +90,19 @@ export default function App() {
           />
 
           {["DRIVER", "CLERK", "SUPERVISOR"].includes(session.user.role) && (
-            <ShipmentForm
-              token={session.accessToken}
-              onUnauthorized={handleUnauthorized}
-            />
+            <>
+              <ShipmentForm
+                token={session.accessToken}
+                onUnauthorized={handleUnauthorized}
+              />
+
+              <PackageReceiptForm
+                key={session.user.id}
+                token={session.accessToken}
+                userId={session.user.id}
+                onUnauthorized={handleUnauthorized}
+              />
+            </>
           )}
 
           <ShipmentLookup
