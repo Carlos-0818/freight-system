@@ -9,11 +9,11 @@ export class TrackingServiceError extends Error {
   }
 }
 
-function replayReceipt(event, packageData, user) {
+function replayReceipt(event, packageData, user, inputMethod) {
   const matches =
     event.packageId === packageData.id &&
     event.type === "RECEIVED" &&
-    event.inputMethod === "MANUAL" &&
+    event.inputMethod === inputMethod &&
     event.stationId === user.station.id &&
     event.operatorId === user.id &&
     event.recordedById === user.id;
@@ -75,7 +75,12 @@ export async function receivePackage(input, user) {
       });
 
       if (existingEvent) {
-        return replayReceipt(existingEvent, packageData, user);
+        return replayReceipt(
+          existingEvent,
+          packageData,
+          user,
+          input.inputMethod,
+        );
       }
 
       if (packageData.latestTrackingEventId !== null) {
@@ -94,7 +99,7 @@ export async function receivePackage(input, user) {
           stationId: user.station.id,
           operatorId: user.id,
           recordedById: user.id,
-          inputMethod: "MANUAL",
+          inputMethod: input.inputMethod,
           occurredAt: new Date(),
         },
       });
@@ -135,7 +140,12 @@ export async function receivePackage(input, user) {
       });
 
       if (existingEvent) {
-        return replayReceipt(existingEvent, packageData, user);
+        return replayReceipt(
+          existingEvent,
+          packageData,
+          user,
+          input.inputMethod,
+        );
       }
     }
 

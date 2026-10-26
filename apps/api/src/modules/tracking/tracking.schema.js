@@ -10,4 +10,10 @@ export const receivePackageSchema = z.strictObject({
     .trim()
     .min(1, { error: "請輸入貨件編號。" })
     .max(100, { error: "貨件編號不得超過 100 個字元。" }),
+
+  inputMethod: z
+    .enum(["MANUAL", "CAMERA"], {
+      error: "輸入方式必須是 MANUAL 或 CAMERA。",
+    })
+    .default("MANUAL"),
 });
