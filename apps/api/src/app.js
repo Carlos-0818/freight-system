@@ -4,6 +4,7 @@ import authRouter from "./modules/auth/auth.routes.js";
 import stationRouter from "./modules/stations/station.routes.js";
 import shipmentRouter from "./modules/shipments/shipment.routes.js";
 import packageRouter from "./modules/packages/package.routes.js";
+import trackingRouter from "./modules/tracking/tracking.routes.js";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/stations", stationRouter);
 app.use("/api/shipments", shipmentRouter);
 app.use("/api/packages", packageRouter);
+app.use("/api/tracking", trackingRouter);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
