@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { apiRequest } from "../../lib/api.js";
 import PackageBarcode from "./PackageBarcode.jsx";
+import PackageTracking from "./PackageTracking.jsx";
 
 export default function PackageLookup({ token, onUnauthorized }) {
   const [code, setCode] = useState("");
@@ -148,6 +149,11 @@ export default function PackageLookup({ token, onUnauthorized }) {
               </time>
             </dd>
           </dl>
+
+          <PackageTracking
+            latestTrackingEvent={packageData.latestTrackingEvent}
+            trackingEvents={packageData.trackingEvents}
+          />
 
           <h3>所屬託運單</h3>
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { apiRequest } from "../../lib/api.js";
 import PackageBarcode from "./PackageBarcode.jsx";
+import PackageTracking from "./PackageTracking.jsx";
 
 export default function ShipmentLookup({ token, onUnauthorized }) {
   const [paperNumber, setPaperNumber] = useState("");
@@ -171,6 +172,11 @@ export default function ShipmentLookup({ token, onUnauthorized }) {
                   點交標記：
                   {pkg.needsHandover ? "需要點交" : "一般貨件"}
                 </p>
+
+                <PackageTracking
+                  latestTrackingEvent={pkg.latestTrackingEvent}
+                  trackingEvents={pkg.trackingEvents}
+                />
               </li>
             ))}
           </ul>
